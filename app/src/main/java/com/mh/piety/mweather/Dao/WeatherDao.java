@@ -31,12 +31,17 @@ public class WeatherDao {
         db.close();
         return list;
     }
-    public boolean query(String position){
+    public LocalInfoBean query(String position){
         Cursor cursor=db.rawQuery("select * from weather where position=?",new String[]{position});
-        if(cursor.getCount()>0){return true;}
+        if(cursor.moveToNext()){
+            LocalInfoBean lb = new LocalInfoBean();
+            lb.position=cursor.getString(1);
+            lb.weather_info=cursor.getString(2);
+            return lb;
+        }
         cursor.close();
         db.close();
-        return false;
+        return null;
     }
     public void add(String position,String weather_info){
         ContentValues values = new ContentValues();

@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
+        //浮动button添加地址
         FloatingActionButton float_btn = (FloatingActionButton) findViewById(R.id.float_btn);
         float_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //侧边栏监听item点击事件
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -222,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (position!="") {
-            final boolean isexist = new WeatherUtil().isExist(mContext,position);
+            final boolean isexist = (new WeatherUtil().queryInfo(mContext,position)!=null);
             tv_position.setText(position);
             new Thread(new Runnable() {
                 @Override
@@ -300,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
         wb.time=wutil.getUpdateTime();
         return wb;
     }
+
+    //选择地址后直接从网络获取数据更新UI
     private void updateUI(WeatherBean wb){
         tv_tmp.setText(wb.now.tmp + "°");
         tv_fl.setText("体感温度：" + wb.now.fl + "°");
@@ -336,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
         tv_ttxt.setText(wb.trav.txt);
         tv_update.setText("最后更新时间：" + wb.time);
     }
+    //偏好地址的天气信息，若有网络 从网络获取数据更新，若无网 从本地获取缓存的天气数据
     public void update(String position){
         final String str_position=position;
         if(checkNet()){
@@ -359,15 +364,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             WeatherUtil wutil = new WeatherUtil();
-            ArrayList<LocalInfoBean> list = wutil.getPrePosition(mContext);
-            for(LocalInfoBean l:list){
-                if(l.position.equals(str_position)){
-                    wutil.jsondata=l.weather_info;
-                    WeatherBean wb = setWeatherBean(wutil,1);
-                    updateUI(wb);
-                    break;
-                }
-            }
+            wutil.jsondata=wutil.queryInfo(mContext,str_position).weather_info;
+            WeatherBean wb = setWeatherBean(wutil,1);
+            updateUI(wb);
         }
     }
 }

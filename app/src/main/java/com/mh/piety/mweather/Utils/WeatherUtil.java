@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -139,15 +138,11 @@ public class WeatherUtil {
         return time;
     }
     public static ArrayList<LocalInfoBean> getPrePosition(Context context){
-        ArrayList<LocalInfoBean> list = new ArrayList<>();
-        try {
-            list = new WeatherDao(context).queryAll();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        ArrayList<LocalInfoBean> list;
+        list = new WeatherDao(context).queryAll();
         return list;
     }
-    public static boolean isExist(Context context,String position){
+    public static LocalInfoBean queryInfo(Context context,String position){
         return new WeatherDao(context).query(position);
     }
     public static void storeWeatherInfo(Context context,String position,String weather_info){
